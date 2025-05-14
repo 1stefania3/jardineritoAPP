@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "328234171523",
+    "project_id": "jardinerito-c92bd",
+    "storage_bucket": "jardinerito-c92bd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:328234171523:android:a5772acbcdf3fcb1086fb6",
+        "android_client_info": {
+          "package_name": "com.example.jardineritoapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWgTr1LVoxvL7l4GkGi9F50E1ZnIaUXBw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:328234171523:android:4173051f55098af8086fb6",
+        "android_client_info": {
+          "package_name": "jardineritointec.com"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWgTr1LVoxvL7l4GkGi9F50E1ZnIaUXBw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
