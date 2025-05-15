@@ -12,7 +12,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<Map<String, dynamic>> _allPlants = [];
   List<Map<String, dynamic>> _filteredPlants = [];
-  String? _selectedType;
 
   @override
   void initState() {
@@ -44,70 +43,68 @@ class _ExploreScreenState extends State<ExploreScreen> {
     setState(() {
       _filteredPlants = _allPlants.where((plant) {
         final name = normalizeText(plant['01_Nombre'] ?? '');
-        final type = plant['tipo'] ?? '';
-        final matchesName = name.contains(query);
-        final matchesType = _selectedType == null || type == _selectedType;
-        return matchesName && matchesType;
+        return name.contains(query);
       }).toList();
     });
   }
 
   Future<void> _fetchPlants() async {
-    final snapshot = await FirebaseFirestore.instance.collection('Plantas').get();
-    final plants = snapshot.docs.map((doc) => doc.data()).toList();
-    setState(() {
-      _allPlants = plants;
-      _filteredPlants = plants;
-    });
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance.collection('Plantas').get();
+
+      final plants = snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return data;
+      }).toList();
+
+      setState(() {
+        _allPlants = List<Map<String, dynamic>>.from(plants);
+        _filteredPlants = List<Map<String, dynamic>>.from(plants);
+      });
+    } catch (e) {
+      print('Error al obtener plantas: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: InteractiveViewer(
-              maxScale: 4.0,
-              minScale: 1.0,
-              child: CustomPaint(
-                painter: BackgroundPainter(),
-                child: _buildCanvas(),
-              ),
-            ),
+      appBar: AppBar(
+        title: Text('Explorar Plantas'),
+        backgroundColor: Colors.green,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(56),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: _buildSearchBar(),
           ),
-          Positioned(
-            top: 40,
-            left: 16,
-            right: 16,
-            child: Column(
-              children: [
-                _buildSearchBar(),
-                const SizedBox(height: 10),
-                _buildTypeFilters(),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
-    );
-  }
-
-  Widget _buildCanvas() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 150),
-      child: GridView.builder(
-        padding: const EdgeInsets.all(20),
+      body: GridView.builder(
+        padding: const EdgeInsets.all(8),
         itemCount: _filteredPlants.length,
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 250,
-          childAspectRatio: 0.75,
-          crossAxisSpacing: 20,
-          mainAxisSpacing: 20,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3, // 3 columnas estilo feed instagram
+          crossAxisSpacing: 4,
+          mainAxisSpacing: 4,
+          childAspectRatio: 1, // cuadrado perfecto
         ),
         itemBuilder: (context, index) {
           final plant = _filteredPlants[index];
-          return _buildPlantCardGrid(plant);
+          return GestureDetector(
+            onTap: () => _showPlantDetailsModal(plant),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                plant['13_imagen'] ?? '',
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) =>
+                    Container(color: Colors.grey[300], child: const Icon(Icons.image_not_supported)),
+              ),
+            ),
+          );
         },
       ),
     );
@@ -135,147 +132,104 @@ class _ExploreScreenState extends State<ExploreScreen> {
     );
   }
 
-  Widget _buildTypeFilters() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: ['Ornamental', 'Medicinal', 'Árbol'].map((type) {
-          final isSelected = _selectedType == type;
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: ChoiceChip(
-              label: Text(type),
-              selected: isSelected,
-              selectedColor: Colors.green.shade200,
-              onSelected: (selected) {
-                setState(() {
-                  _selectedType = selected ? type : null;
-                  _filterPlants();
-                });
-              },
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildPlantCardGrid(Map<String, dynamic> plant) {
-    return GestureDetector(
-      onTap: () => _showPlantDetailsModern(plant),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8)],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                child: Image.network(
-                  plant['13_imagen'] ?? '',
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      const Icon(Icons.image_not_supported, size: 50),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                plant['01_Nombre'] ?? 'Sin nombre',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showPlantDetailsModern(Map<String, dynamic> plant) {
+  void _showPlantDetailsModal(Map<String, dynamic> plant) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      backgroundColor: Colors.white,
-      isScrollControlled: true,
-      builder: (_) {
+      builder: (context) {
         return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.network(
-                  plant['13_imagen'] ?? '',
-                  height: 180,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.network(
+                    plant['13_imagen'] ?? '',
+                    height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) =>
+                        const Icon(Icons.image_not_supported, size: 50),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                plant['01_Nombre'] ?? 'Sin nombre',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                plant['02_Descripción'] ?? 'Sin descripción',
-                style: const TextStyle(fontSize: 16, color: Colors.black87),
-                textAlign: TextAlign.justify,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  final newDoc = FirebaseFirestore.instance.collection('MisPlantas').doc();
-                  final newId = newDoc.id;
-                  final plantWithId = Map<String, dynamic>.from(plant);
-                  plantWithId['id'] = newId;
-                  await newDoc.set(plantWithId);
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${plant['01_Nombre']} añadida a Mis Plantas')),
-                  );
-                },
-                child: const Text('Añadir a Mis Plantas'),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-              ),
-              const SizedBox(height: 20),
-            ],
+                const SizedBox(height: 20),
+                Text(
+                  plant['01_Nombre'] ?? 'Sin nombre',
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  plant['02_Descripción'] ?? 'Sin descripción',
+                  style: const TextStyle(fontSize: 16),
+                  textAlign: TextAlign.justify,
+                ),
+                const SizedBox(height: 12),
+                // Puedes agregar más campos importantes aquí, por ejemplo:
+                if ((plant['03_Ubicación'] ?? '').isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.place, color: Colors.green),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text('Ubicación ideal: ${plant['03_Ubicación']}')),
+                    ],
+                  ),
+                ],
+                if ((plant['04_Luz'] ?? '').isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.wb_sunny, color: Colors.orange),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text('Luz: ${plant['04_Luz']}')),
+                    ],
+                  ),
+                ],
+                if ((plant['05_Temperatura'] ?? '').isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.thermostat, color: Colors.redAccent),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text('Temperatura ideal: ${plant['05_Temperatura']}')),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    final newDoc = FirebaseFirestore.instance.collection('MisPlantas').doc();
+                    final newId = newDoc.id;
+                    final plantWithId = Map<String, dynamic>.from(plant);
+                    plantWithId['id'] = newId;
+                    await newDoc.set(plantWithId);
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('${plant['01_Nombre']} añadida a Mis Plantas'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.favorite_border),
+                  label: const Text('Añadir a Mis Favoritos'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    minimumSize: const Size(double.infinity, 48),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
     );
   }
-}
-
-class BackgroundPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.green.shade50
-      ..style = PaintingStyle.fill;
-
-    final path = Path();
-    path.moveTo(0, size.height * 0.3);
-    path.quadraticBezierTo(size.width * 0.25, size.height * 0.2, size.width * 0.5, size.height * 0.35);
-    path.quadraticBezierTo(size.width * 0.75, size.height * 0.5, size.width, size.height * 0.3);
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.close();
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

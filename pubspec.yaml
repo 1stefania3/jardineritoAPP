@@ -27,6 +27,8 @@ dependencies:
   animated_text_kit: ^4.2.2
   provider: ^6.1.1
   flutter_svg: ^2.0.7
+  
+
 
 dev_dependencies:
   flutter_test:
@@ -41,10 +43,16 @@ flutter:
     - assets/images/ayuda.png
     - assets/images/explorar.png
     - assets/images/plantas.png
+    - assets/images/jardinerito.png
     - assets/images/lottie/sol.json
     - assets/images/lottie/lluvia.json
     - assets/images/lottie/nubes.json
-
+    - assets/images/lottie/arboles.json
+    - assets/images/lottie/ornamentales.json
+    - assets/images/orna.png
+    - assets/images/medi.png
+    - assets/images/arb.png
+    - assets/images/todas.png
 
   uses-material-design: true
 

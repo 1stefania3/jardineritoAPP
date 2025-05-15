@@ -191,7 +191,7 @@ class _PantallaHomeState extends State<PantallaHome> with SingleTickerProviderSt
                           context,
                           label: "Explorar",
                           imageAsset: "assets/images/explorar.png",
-                          onTap: () => Navigator.pushNamed(context, '/explorar'),
+                          onTap: () => Navigator.pushNamed(context, '/mapa'),
                         ),
                         _buildBubbleButton(
                           context,

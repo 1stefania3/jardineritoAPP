@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:jardineritoapp/pantallas/explore_screen.dart';
 import 'package:jardineritoapp/pantallas/inicio.dart';
+import 'package:jardineritoapp/pantallas/mapa_islas_screen.dart'; 
 import 'package:jardineritoapp/pantallas/home.dart'; 
+
 // pantalla de inicio después del botón
 import 'package:firebase_core/firebase_core.dart';
 
@@ -30,7 +32,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) =>  PantallaInicio(),
         '/home': (context) => const PantallaHome(),
-        '/explorar': (context) => ExploreScreen (),  // Corregir la ruta a '/explorar'
+        '/explorar': (context) => ExploreScreen (), 
+        '/mapa': (context) => MapaIslasPersonalScreen(), // Pantalla del mapa
       },
     );
   }
