@@ -107,16 +107,14 @@ class _PantallaHomeState extends State<PantallaHome> with SingleTickerProviderSt
       body: Stack(
         children: [
           // Fondo con gradiente
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xffc6f1d6), Color(0xffa8e6cf)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-          ),
-
+        Container(
+  decoration: const BoxDecoration(
+    image: DecorationImage(
+      image: AssetImage('assets/images/arboles.jpg'),
+      fit: BoxFit.cover,
+    ),
+  ),
+),
           // Burbujas tipo lámpara de lava
           AnimatedBuilder(
             animation: _controller,

@@ -71,8 +71,16 @@ class _PantallaInicioState extends State<PantallaInicio> with TickerProviderStat
 
     return Scaffold(
       backgroundColor: Colors.green[50],
-      body: Stack(
-        children: [
+        body: Stack(
+  children: [
+    // FONDO DE IMAGEN
+    Positioned.fill(
+      child: Image.asset(
+        'assets/images/fondo.jpg',
+        fit: BoxFit.cover,
+      ),
+    ),
+        
           AnimatedBuilder(
             animation: _confettiController,
             builder: (context, child) {

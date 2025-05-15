@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class OrnamentalesScreen extends StatefulWidget {
   const OrnamentalesScreen({Key? key}) : super(key: key);
 
   @override
-  State<OrnamentalesScreen> createState() => _OrnamentalesScreenState();
+  State<OrnamentalesScreen> createState() => OrnamentalesScreenState();
 }
 
-class _OrnamentalesScreenState extends State<OrnamentalesScreen> {
+class OrnamentalesScreenState extends State<OrnamentalesScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<Map<String, dynamic>> _allPlants = [];
   List<Map<String, dynamic>> _filteredPlants = [];
@@ -26,53 +27,78 @@ class _OrnamentalesScreenState extends State<OrnamentalesScreen> {
     super.dispose();
   }
 
-  Future<void> _fetchPlants() async {
-    final querySnapshot = await FirebaseFirestore.instance
-        .collection('Plantas')
-        .where('tipo', isEqualTo: 'Ornamental')
-        .get();
-
-    final plants = querySnapshot.docs
-        .map((doc) => doc.data() as Map<String, dynamic>)
-        .toList();
-
-    setState(() {
-      _allPlants = plants;
-      _filteredPlants = plants;
-    });
+  String normalizeText(String text) {
+    return text
+        .toLowerCase()
+        .replaceAll(RegExp(r'[áàäâ]'), 'a')
+        .replaceAll(RegExp(r'[éèëê]'), 'e')
+        .replaceAll(RegExp(r'[íìïî]'), 'i')
+        .replaceAll(RegExp(r'[óòöô]'), 'o')
+        .replaceAll(RegExp(r'[úùüû]'), 'u')
+        .replaceAll('"', '')
+        .trim();
   }
 
   void _filterPlants() {
-    final query = _searchController.text.toLowerCase();
+    final query = normalizeText(_searchController.text);
     setState(() {
       _filteredPlants = _allPlants.where((plant) {
-        final nombre = (plant['01_Nombre'] ?? '').toString().toLowerCase();
-        return nombre.contains(query);
+        final name = normalizeText(plant['01_Nombre'] ?? '');
+        return name.contains(query);
       }).toList();
     });
+  }
+
+  Future<void> _fetchPlants() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('Plantas')
+          .where('tipo', isEqualTo: 'Ornamental')
+          .get();
+
+      final plants = snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return data;
+      }).toList();
+
+      setState(() {
+        _allPlants = List<Map<String, dynamic>>.from(plants);
+        _filteredPlants = List<Map<String, dynamic>>.from(plants);
+      });
+    } catch (e) {
+      print('Error al obtener plantas: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Plantas Ornamentales'),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
       ),
       body: Stack(
         children: [
-          CustomPaint(
-            size: Size.infinite,
-            painter: BackgroundPainterOrnamentales(),
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/arboles.jpg',
+              fit: BoxFit.cover,
+              color: Colors.black.withOpacity(0.2),
+              colorBlendMode: BlendMode.darken,
+            ),
           ),
           Column(
             children: [
-              const SizedBox(height: 16),
+              const SizedBox(height: kToolbarHeight + 30),
+              _buildTitleWidget(),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: _buildSearchBar(),
               ),
-              const SizedBox(height: 16),
               Expanded(
                 child: _filteredPlants.isEmpty
                     ? Center(
@@ -82,7 +108,7 @@ class _OrnamentalesScreenState extends State<OrnamentalesScreen> {
                               : 'No se encontraron plantas ornamentales para "${_searchController.text}".',
                           style: const TextStyle(
                             fontSize: 18,
-                            color: Colors.green,
+                            color: Colors.white,
                             fontWeight: FontWeight.w600,
                           ),
                           textAlign: TextAlign.center,
@@ -90,14 +116,10 @@ class _OrnamentalesScreenState extends State<OrnamentalesScreen> {
                       )
                     : Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: GridView.builder(
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 16,
-                            crossAxisSpacing: 16,
-                            childAspectRatio: 0.7,
-                          ),
+                        child: MasonryGridView.count(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
                           itemCount: _filteredPlants.length,
                           itemBuilder: (context, index) {
                             final plant = _filteredPlants[index];
@@ -113,23 +135,33 @@ class _OrnamentalesScreenState extends State<OrnamentalesScreen> {
     );
   }
 
+  Widget _buildTitleWidget() {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Image.asset(
+          'assets/images/titulo.jpg',
+          width: 280,
+        ),
+      ],
+    );
+  }
+
   Widget _buildSearchBar() {
     return Material(
-      elevation: 4,
-      borderRadius: BorderRadius.circular(30),
+      elevation: 6,
+      borderRadius: BorderRadius.circular(40),
+      color: Colors.white.withOpacity(0.9),
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: 'Buscar planta ornamental...',
+          hintText: 'Buscar plantas ornamentales por nombre...',
           prefixIcon: const Icon(Icons.search, color: Colors.green),
-          filled: true,
-          fillColor: Colors.white,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(40),
             borderSide: BorderSide.none,
           ),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           hintStyle: const TextStyle(color: Colors.green),
         ),
       ),
@@ -138,37 +170,83 @@ class _OrnamentalesScreenState extends State<OrnamentalesScreen> {
 
   Widget _buildPlantCard(Map<String, dynamic> plant) {
     return GestureDetector(
-      onTap: () => _showPlantDetails(plant),
+      onTap: () => _showPlantDetails(context, plant),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8)],
+          image: const DecorationImage(
+            image: AssetImage('assets/images/acuarelarosa.jpg'),
+            fit: BoxFit.cover,
+          ),
+          border: Border.all(
+            color: Colors.green.shade700.withOpacity(0.4),
+            width: 2,
+          ),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 6,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(20)),
-                child: Image.network(
-                  plant['13_imagen'] ?? '',
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      const Icon(Icons.image_not_supported, size: 50),
-                ),
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              child: Image.network(
+                plant['13_imagen'] ?? '',
+                height: 120,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) =>
+                    const Icon(Icons.image_not_supported, size: 50),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                plant['01_Nombre'] ?? 'Sin nombre',
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+            Container(
+              width: double.infinity,
+              
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  Text(
+                    plant['01_Nombre'] ?? 'Sylverna',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'CinzelDecorative',
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black,
+                          offset: Offset(0, 1),
+                          blurRadius: 2,
+                        ),
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    plant['02_Descripción']?.toString().split('.').first ??
+                        'Un árbol místico con hojas danzantes.',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.white70,
+                      height: 1.2,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black,
+                          offset: Offset(0, 1),
+                          blurRadius: 2,
+                        ),
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ),
           ],
@@ -177,93 +255,213 @@ class _OrnamentalesScreenState extends State<OrnamentalesScreen> {
     );
   }
 
-  void _showPlantDetails(Map<String, dynamic> plant) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      backgroundColor: Colors.white,
-      isScrollControlled: true,
-      builder: (_) {
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.network(
-                  plant['13_imagen'] ?? '',
-                  height: 180,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      const Icon(Icons.image_not_supported, size: 50),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                plant['01_Nombre'] ?? 'Sin nombre',
-                style: const TextStyle(
-                    fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                plant['02_Descripción'] ?? 'Sin descripción',
-                style: const TextStyle(fontSize: 16, color: Colors.black87),
-                textAlign: TextAlign.justify,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  final newDoc =
-                      FirebaseFirestore.instance.collection('MisPlantas').doc();
-                  final newId = newDoc.id;
-                  final plantWithId = Map<String, dynamic>.from(plant);
-                  plantWithId['id'] = newId;
-                  await newDoc.set(plantWithId);
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content:
-                          Text('${plant['01_Nombre']} añadida a Mis Plantas'),
-                    ),
-                  );
-                },
-                child: const Text('Añadir a Mis Plantas'),
-                style:
-                    ElevatedButton.styleFrom(backgroundColor: Colors.green),
-              ),
-              const SizedBox(height: 20),
-            ],
+  Widget _buildInfoRow(String label, String? value) {
+    if (value == null || value.trim().isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$label: ',
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
           ),
-        );
-      },
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(color: Colors.black87),
+            ),
+          ),
+        ],
+      ),
     );
   }
+
+ void _showPlantDetails(BuildContext context, Map<String, dynamic> plant) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+    ),
+    builder: (_) {
+      return DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.85,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        builder: (_, controller) {
+          String imageUrl = (plant['13_imagen'] ?? '').toString().trim();
+          String title = (plant['fantasy_name'] ?? plant['01_Nombre'] ?? 'Sin nombre').toString();
+          String description = (plant['02_Descripción'] ?? 'Sin descripción').toString();
+
+          return Container(
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+              image: const DecorationImage(
+                image: AssetImage('assets/images/acuarelarosa.jpg'),
+                fit: BoxFit.cover,
+              ),
+              border: Border.all(
+                color: Colors.green.shade700.withOpacity(0.4),
+                width: 2,
+              ),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color.fromARGB(0, 0, 0, 0),
+                  blurRadius: 6,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Container(
+              // Fondo oscuro semi-transparente para el contenido
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.7),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+              ),
+              padding: const EdgeInsets.all(20),
+              child: SingleChildScrollView(
+                controller: controller,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: imageUrl.isNotEmpty
+                            ? Image.network(
+                                imageUrl,
+                                height: 200,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) =>
+                                    const Icon(Icons.image_not_supported, size: 50, color: Colors.white70),
+                              )
+                            : const Icon(Icons.image_not_supported, size: 50, color: Colors.white70),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Center(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontFamily: 'CinzelDecorative',
+                          shadows: [
+                            Shadow(
+                              color: Colors.black54,
+                              offset: Offset(0, 1),
+                              blurRadius: 4,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      description,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        height: 1.5,
+                      ),
+                      textAlign: TextAlign.justify,
+                    ),
+                    const SizedBox(height: 24),
+                    _buildInfoRowWhite("Ubicación ideal", plant['03_UbicaciónIdeal']?.toString()),
+                    _buildInfoRowWhite("Riego", plant['04_Riego']?.toString()),
+                    _buildInfoRowWhite("Temperatura", plant['05_Temperatura']?.toString()),
+                    _buildInfoRowWhite("Cuidados", plant['06_Cuidados']?.toString()),
+                    _buildInfoRowWhite("Época de siembra", plant['07_Época']?.toString()),
+                    _buildInfoRowWhite("Usos", plant['08_Usos']?.toString()),
+                    _buildInfoRowWhite("Frecuencia de poda", plant['09_FrecuenciaPoda']?.toString()),
+                    const SizedBox(height: 30),
+                    Center(
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.favorite_border, size: 24),
+                        label: const Text(
+                          'Añadir a Mis Plantas',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                        ),
+                        onPressed: () async {
+                          try {
+                            final newDoc = FirebaseFirestore.instance.collection('MisPlantas').doc();
+                            final newId = newDoc.id;
+                            final plantWithId = Map<String, dynamic>.from(plant);
+                            plantWithId['id'] = newId;
+                            await newDoc.set(plantWithId);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Añadido a Mis Plantas')),
+                              );
+                              Navigator.pop(context);
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Error al añadir planta: $e')),
+                              );
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green.shade700,
+                          elevation: 8,
+                          padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(40),
+                          ),
+                          shadowColor: Colors.greenAccent.shade400,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
 }
 
-class BackgroundPainterOrnamentales extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.pink.shade100
-      ..style = PaintingStyle.fill;
+Widget _buildInfoRowWhite(String label, String? value) {
+  if (value == null || value.trim().isEmpty) return const SizedBox.shrink();
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 14),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '$label: ',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: 16,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 16,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
-    final path = Path();
-    path.moveTo(0, size.height * 0.5);
-    path.quadraticBezierTo(
-        size.width * 0.3, size.height * 0.4, size.width * 0.6, size.height * 0.55);
-    path.quadraticBezierTo(
-        size.width * 0.8, size.height * 0.7, size.width, size.height * 0.5);
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.close();
 
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

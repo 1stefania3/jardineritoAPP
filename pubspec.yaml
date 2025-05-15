@@ -53,6 +53,12 @@ flutter:
     - assets/images/medi.png
     - assets/images/arb.png
     - assets/images/todas.png
+    - assets/images/arboles.jpg
+    - assets/images/titulo.jpg
+    - assets/images/acuarelaverde.jpg
+    - assets/images/acuarelarosa.jpg
+    - assets/images/fondo.jpg
+
 
   uses-material-design: true
 
