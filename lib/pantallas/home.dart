@@ -56,9 +56,9 @@ class _PantallaHomeState extends State<PantallaHome> with SingleTickerProviderSt
 
         setState(() {
           if (weatherCondition.contains('rain')) {
-            currentWeather = 'rain';
+            currentWeather = 'claud';
           } else if (weatherCondition.contains('cloud')) {
-            currentWeather = 'cloud';
+            currentWeather = 'rain';
           } else {
             currentWeather = 'sun';
           }

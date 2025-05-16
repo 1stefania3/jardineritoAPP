@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'pantallas/explore_screen.dart';
-import 'tus_plantas_screen.dart';
+import 'pantallas/tus_plantas_screen.dart';
 import 'historial_screen.dart';
 import 'ayuda_screen.dart';
 

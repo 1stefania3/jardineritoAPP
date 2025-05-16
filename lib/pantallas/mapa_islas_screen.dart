@@ -5,7 +5,8 @@ import 'dart:async';
 import 'explore_screen.dart'; 
 import 'medicinales.dart';
 import 'arboles.dart';
-import 'ornamentales.dart';// Ajusta la ruta según dónde tengas tu ExploreScreen
+import 'ornamentales.dart';
+import   'tus_plantas_screen.dart';// Ajusta la ruta según dónde tengas tu ExploreScreen
 
 class MapaIslasPersonalScreen extends StatefulWidget {
   const MapaIslasPersonalScreen({super.key});
@@ -169,6 +170,56 @@ class _MapaIslasPersonalScreenState extends State<MapaIslasPersonalScreen> with 
               },
             ),
           ),
+//otro boton 
+          // Botón "Mis Plantas"
+         // Botón "Mis Plantas" con imagen sobresaliente
+// Botón "Mis Plantas" con imagen sobresaliente (lado derecho)
+Positioned(
+  bottom: 20,          // distancia al borde inferior
+  right: 20,           // distancia al borde derecho
+  child: Stack(
+    alignment: Alignment.topCenter,
+    children: [
+      // Imagen que sobresale por encima del botón
+      Positioned(
+        top: -40,      // la eleva para que “flote” sobre el botón
+        child: Image.asset(
+          'assets/images/plantas.png',
+          width: 80,
+          height: 80,
+          fit: BoxFit.contain,
+        ),
+      ),
+      // Botón circular/redondeado
+      ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF4CAF50),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          elevation: 10,
+          shadowColor: Colors.black45,
+        ),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const TusPlantasScreen()),
+          );
+        },
+        child: const Text(
+          'Mis Plantas',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    ],
+  ),
+),
+
 
           // Jardinerito animado con mensaje visible debajo
           TweenAnimationBuilder<Offset>(

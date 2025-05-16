@@ -156,13 +156,13 @@ class OrnamentalesScreenState extends State<OrnamentalesScreen> {
         controller: _searchController,
         decoration: InputDecoration(
           hintText: 'Buscar plantas ornamentales por nombre...',
-          prefixIcon: const Icon(Icons.search, color: Colors.green),
+          prefixIcon: const Icon(Icons.search, color: Color.fromARGB(255, 154, 11, 167)),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(40),
             borderSide: BorderSide.none,
           ),
           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          hintStyle: const TextStyle(color: Colors.green),
+          hintStyle: const TextStyle(color: Color.fromARGB(255, 162, 16, 199)),
         ),
       ),
     );

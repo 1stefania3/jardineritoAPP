@@ -155,14 +155,14 @@ class _MedicinalesScreenState extends State<MedicinalesScreen> {
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: 'Buscar árbol por nombre...',
-          prefixIcon: const Icon(Icons.search, color: Colors.green),
+          hintText: 'Buscar planta medicinal  por nombre...',
+          prefixIcon: const Icon(Icons.search, color: Color.fromARGB(255, 5, 95, 230)),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(40),
             borderSide: BorderSide.none,
           ),
           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          hintStyle: const TextStyle(color: Colors.green),
+          hintStyle: const TextStyle(color: Color.fromARGB(255, 9, 114, 235)),
         ),
       ),
     );
