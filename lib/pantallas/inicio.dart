@@ -126,7 +126,7 @@ class _PantallaInicioState extends State<PantallaInicio> with TickerProviderStat
                             style: TextStyle(
                               fontSize: 18,
                               fontStyle: FontStyle.italic,
-                              color: Colors.green[800],
+                              color: const Color.fromARGB(255, 164, 222, 167),
                             ),
                             textAlign: TextAlign.center,
                           ),
