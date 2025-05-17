@@ -54,10 +54,10 @@ flutter:
     - assets/images/arb.png
     - assets/images/todas.png
     - assets/images/arboles.jpg
-    - assets/images/titulo_arb.jpg
-    - assets/images/titulo_medi.jpg
-    - assets/images/titulo_orna.jpg
-    - assets/images/titulo_plantas.jpg
+    - assets/images/titulo_arb.png
+    - assets/images/titulo_medi.png
+    - assets/images/titulo_orna.png
+    - assets/images/titulo_plantas.png
     - assets/images/acuarelaverde.jpg
     - assets/images/acuarelarosa.jpg
     - assets/images/fondo.jpg
