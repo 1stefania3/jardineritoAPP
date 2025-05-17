@@ -140,7 +140,7 @@ class _ArbolesScreenState extends State<ArbolesScreen> {
       alignment: Alignment.center,
       children: [
         Image.asset(
-          'assets/images/titulo.jpg',
+          'assets/images/titulo_arb.png',
           width: 280,
         ),
       ],
