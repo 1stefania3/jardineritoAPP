@@ -140,7 +140,7 @@ class OrnamentalesScreenState extends State<OrnamentalesScreen> {
       alignment: Alignment.center,
       children: [
         Image.asset(
-          'assets/images/titulo.jpg',
+          'assets/images/titulo_orna.jpg',
           width: 280,
         ),
       ],

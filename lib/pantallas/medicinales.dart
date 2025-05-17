@@ -140,7 +140,7 @@ class _MedicinalesScreenState extends State<MedicinalesScreen> {
       alignment: Alignment.center,
       children: [
         Image.asset(
-          'assets/images/titulo.jpg',
+          'assets/images/titulo_medi.png',
           width: 280,
         ),
       ],
