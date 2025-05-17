@@ -141,7 +141,7 @@ class OrnamentalesScreenState extends State<OrnamentalesScreen> {
       children: [
         Image.asset(
           'assets/images/titulo_orna.png',
-          width: 280,
+          width: 300,
         ),
       ],
     );

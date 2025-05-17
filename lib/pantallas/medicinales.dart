@@ -141,7 +141,7 @@ class _MedicinalesScreenState extends State<MedicinalesScreen> {
       children: [
         Image.asset(
           'assets/images/titulo_medi.png',
-          width: 280,
+          width: 300,
         ),
       ],
     );
