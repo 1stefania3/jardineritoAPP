@@ -141,7 +141,7 @@ class _ArbolesScreenState extends State<ArbolesScreen> {
       children: [
         Image.asset(
           'assets/images/titulo_arb.png',
-          width: 280,
+          width: 300,
         ),
       ],
     );

@@ -140,7 +140,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       children: [
         Image.asset(
           'assets/images/titulo_plantas.png',
-          width: 280,
+          width: 300,
         ),
       ],
     );
