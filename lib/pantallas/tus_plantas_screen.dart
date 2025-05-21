@@ -66,7 +66,18 @@ class _TusPlantasScreenState extends State<TusPlantasScreen> {
                 fit: BoxFit.cover,
               ),
             ),
-            
+            // Flecha de regreso
+            Positioned(
+                top: 40,
+               left: 10,
+              child: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+                    onPressed: () {
+                    Navigator.pop(context); // o Navigator.pushReplacement si quieres ir al home
+                 },
+               ),
+            ),
+
             SingleChildScrollView(
               padding: const EdgeInsets.all(12),
               child: Column(
