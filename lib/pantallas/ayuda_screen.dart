@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'chatbot_widget.dart';
 
 class AyudaScreen extends StatelessWidget {
   const AyudaScreen({super.key});
@@ -16,7 +17,6 @@ class AyudaScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Titulo de la pantalla
               Text(
                 "¿Cómo puedo ayudarte?",
                 style: TextStyle(
@@ -26,18 +26,12 @@ class AyudaScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Descripción general de la ayuda
               Text(
                 "Aquí puedes encontrar información sobre cómo utilizar la aplicación, solucionar problemas comunes y obtener más detalles sobre cómo cuidar tus plantas.",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black87,
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.black87),
               ),
               const SizedBox(height: 20),
 
-              // Sección 1
               Card(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -66,7 +60,6 @@ class AyudaScreen extends StatelessWidget {
                 ),
               ),
 
-              // Sección 2
               Card(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -97,15 +90,17 @@ class AyudaScreen extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // Botón para contactar ayuda
               ElevatedButton.icon(
                 onPressed: () {
-                  // Aquí se puede agregar la lógica para contactar ayuda
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ChatbotWidget()),
+                  );
                 },
-                icon: const Icon(Icons.help_outline),
-                label: const Text("Contactar soporte"),
+                icon: const Icon(Icons.chat),
+                label: const Text("Hablar con Jardinerito 🤖"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green.shade700, // Color de fondo
+                  backgroundColor: Colors.green.shade700,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
