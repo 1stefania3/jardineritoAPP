@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'pantallas/explore_screen.dart';
 import 'pantallas/tus_plantas_screen.dart';
 import 'historial_screen.dart';
-import 'ayuda_screen.dart';
+//import 'ayuda_screen.dart';
 
 class NextScreen extends StatefulWidget {
   const NextScreen({super.key});
@@ -19,7 +19,7 @@ class NextScreenState extends State<NextScreen> {
     ExploreScreen(),
     TusPlantasScreen(),
     HistorialScreen(),
-    AyudaScreen(),
+    //AyudaScreen(),
   ];
 
   void _onItemTapped(int index) {
