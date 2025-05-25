@@ -6,7 +6,8 @@ import 'explore_screen.dart';
 import 'medicinales.dart';
 import 'arboles.dart';
 import 'ornamentales.dart';
-import   'tus_plantas_screen.dart';// Ajusta la ruta según dónde tengas tu ExploreScreen
+import 'tus_plantas_screen.dart';
+import 'home.dart';// Ajusta la ruta según dónde tengas tu ExploreScreen
 
 class MapaIslasPersonalScreen extends StatefulWidget {
   const MapaIslasPersonalScreen({super.key});
@@ -81,8 +82,10 @@ class _MapaIslasPersonalScreenState extends State<MapaIslasPersonalScreen> with 
         : Offset(MediaQuery.of(context).size.width / 2 - 60, 100);
 
     return Scaffold(
+      
       body: Stack(
         children: [
+       
           // Fondo gradiente
           Container(
             decoration: const BoxDecoration(
@@ -216,6 +219,7 @@ Positioned(
           ),
         ),
       ),
+      
     ],
   ),
 ),
@@ -305,6 +309,7 @@ class IslaImagenCustom extends StatelessWidget {
       onTap: onTap,
       child: Column(
         children: [
+          
           Stack(
             alignment: Alignment.center,
             children: [
@@ -329,6 +334,7 @@ class IslaImagenCustom extends StatelessWidget {
                   ),
                 ),
               ),
+               
             ],
           ),
           const SizedBox(height: 5),

@@ -121,14 +121,12 @@ class _TusPlantasScreenState extends State<TusPlantasScreen> {
 
 
                             return GestureDetector(
-                             onTap: () {
+                              onTap: () {
   setState(() {
     plantaSeleccionadaId = plants[index].id; // guarda el ID
-    planta = plants[index].data() as Map<String, dynamic>; // guarda el mapa completo aquí
     seccionActiva = null;
   });
 },
-
 
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 300),
