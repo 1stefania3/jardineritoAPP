@@ -10,7 +10,8 @@ class TusPlantasScreen extends StatefulWidget {
 }
 
 class _TusPlantasScreenState extends State<TusPlantasScreen> {
-  Map<String, dynamic>? plantaSeleccionada;
+  String? plantaSeleccionadaId; 
+  Map<String, dynamic>? planta;
   String? seccionActiva;
 
   // Campos que mostrarás en los botones laterales, elimina o agrega según quieras
@@ -116,16 +117,19 @@ class _TusPlantasScreenState extends State<TusPlantasScreen> {
                           itemCount: plants.length,
                           itemBuilder: (context, index) {
                             final plantaData = plants[index].data() as Map<String, dynamic>;
-                            final isSelected = plantaSeleccionada != null &&
-                                plantaSeleccionada!['01_Nombre'] == plantaData['01_Nombre'];
+                           final isSelected = plantaSeleccionadaId == plants[index].id;
+
 
                             return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  plantaSeleccionada = plantaData;
-                                  seccionActiva = null;
-                                });
-                              },
+                             onTap: () {
+  setState(() {
+    plantaSeleccionadaId = plants[index].id; // guarda el ID
+    planta = plants[index].data() as Map<String, dynamic>; // guarda el mapa completo aquí
+    seccionActiva = null;
+  });
+},
+
+
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 300),
                                 width: isSelected ? width * 0.50 : width * 0.45,
@@ -220,7 +224,7 @@ class _TusPlantasScreenState extends State<TusPlantasScreen> {
                           },
                         ),
                       ),
-                      if (plantaSeleccionada != null)
+                      if (plantaSeleccionadaId != null)
                         Container(
                           margin: const EdgeInsets.only(top: 30),
                           padding: const EdgeInsets.all(12),
@@ -272,7 +276,7 @@ class _TusPlantasScreenState extends State<TusPlantasScreen> {
                                 flex: 5,
                                 child: Padding(
                                   padding: const EdgeInsets.all(16),
-                                  child: _contenidoSeccion(plantaSeleccionada!, seccionActiva),
+                                  child: _contenidoSeccion(plants.firstWhere((p) => p.id == plantaSeleccionadaId).data() as Map<String, dynamic>, seccionActiva),
                                 ),
                               ),
                               Expanded(
@@ -324,11 +328,12 @@ class _TusPlantasScreenState extends State<TusPlantasScreen> {
           height: 50,
           child: ElevatedButton.icon(
             onPressed: () {
-              if (plantaSeleccionada != null) {
+              if (plantaSeleccionadaId != null) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MedirScreen(planta: plantaSeleccionada),
+                  builder: (context) => MedirScreen(planta: planta),
+
                   ),
                 );
               } else {
