@@ -100,82 +100,90 @@ class _PantallaInicioState extends State<PantallaInicio> with TickerProviderStat
                   const SizedBox(height: 40),
                   SlideTransition(
                     position: _textOffset,
-                    child: FadeTransition(
-                      opacity: _textFade,
-                      child: Column(
-                        children: [
-                          Text(
-                            '¡Gracias por confiar en Planti-Bot!',
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.green[900],
-                              shadows: [
-                                Shadow(
-                                  offset: Offset(1, 1),
-                                  blurRadius: 2,
-                                  color: Colors.black26,
-                                ),
-                              ],
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            'Tu compañero verde para cuidar tus plantas.',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontStyle: FontStyle.italic,
-                              color: const Color.fromARGB(255, 32, 71, 34),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 50),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pushReplacementNamed(context, '/home');
-                            },
-                            child: AnimatedScale(
-                              scale: 1,
-                              duration: Duration(milliseconds: 300),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [Colors.green[700]!, Colors.green[400]!],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
-                                  borderRadius: BorderRadius.circular(40),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.green.withOpacity(0.3),
-                                      blurRadius: 10,
-                                      offset: Offset(0, 5),
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.eco_rounded, color: Colors.white),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      'Comienza la experiencia',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    child:FadeTransition(
+  opacity: _textFade,
+  child: Container(
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.white.withOpacity(0.7), // Fondo semitransparente
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: Column(
+      children: [
+        Text(
+          '¡Gracias por confiar en Planti-Bot!',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w900,
+            color: Colors.green[900],
+            shadows: [
+              Shadow(
+                offset: Offset(1, 1),
+                blurRadius: 2,
+                color: Colors.black26,
+              ),
+            ],
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 10),
+        Text(
+          'Tu compañero verde para cuidar tus plantas.',
+          style: TextStyle(
+            fontSize: 18,
+            fontStyle: FontStyle.italic,
+            color: const Color.fromARGB(255, 32, 71, 34),
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 50),
+        GestureDetector(
+          onTap: () {
+            Navigator.pushReplacementNamed(context, '/home');
+          },
+          child: AnimatedScale(
+            scale: 1,
+            duration: Duration(milliseconds: 300),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.green[700]!, Colors.green[400]!],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(40),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.green.withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.eco_rounded, color: Colors.white),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Comienza la experiencia',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  ),
+),
+
                   ),
                 ],
               ),

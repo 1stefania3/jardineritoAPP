@@ -4,7 +4,7 @@ import 'package:jardineritoapp/pantallas/inicio.dart';
 import 'package:jardineritoapp/pantallas/mapa_islas_screen.dart'; 
 import 'package:jardineritoapp/pantallas/home.dart'; 
 import 'package:jardineritoapp/pantallas/ayuda_screen.dart';  // Importa la pantalla ayuda
-
+import 'package:jardineritoapp/pantallas/tus_plantas_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
@@ -31,7 +31,9 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const PantallaHome(),
         '/explorar': (context) => ExploreScreen(),
         '/mapa': (context) => MapaIslasPersonalScreen(),
-        '/ayuda': (context) => const AyudaScreen(),  // Ruta agregada
+        '/ayuda': (context) => const AyudaScreen(),  
+        '/tusplantas':(context)=>   TusPlantasScreen(),
+        // Ruta agregada
       },
     );
   }
