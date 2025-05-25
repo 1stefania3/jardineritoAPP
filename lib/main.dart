@@ -33,6 +33,7 @@ class MyApp extends StatelessWidget {
         '/mapa': (context) => MapaIslasPersonalScreen(),
         '/ayuda': (context) => const AyudaScreen(),  
         '/tusplantas':(context)=>   TusPlantasScreen(),
+        
         // Ruta agregada
       },
     );

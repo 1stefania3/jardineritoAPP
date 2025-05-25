@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'medir_screen.dart';
+import 'riego.dart';
 
 class TusPlantasScreen extends StatefulWidget {
   const TusPlantasScreen({super.key});
@@ -121,12 +122,14 @@ class _TusPlantasScreenState extends State<TusPlantasScreen> {
 
 
                             return GestureDetector(
-                              onTap: () {
+                             onTap: () {
   setState(() {
     plantaSeleccionadaId = plants[index].id; // guarda el ID
+    planta = plants[index].data() as Map<String, dynamic>; // guarda el mapa completo aquí
     seccionActiva = null;
   });
 },
+
 
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 300),
@@ -270,13 +273,27 @@ class _TusPlantasScreenState extends State<TusPlantasScreen> {
                                   }).toList(),
                                 ),
                               ),
-                              Expanded(
-                                flex: 5,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: _contenidoSeccion(plants.firstWhere((p) => p.id == plantaSeleccionadaId).data() as Map<String, dynamic>, seccionActiva),
-                                ),
-                              ),
+                             Expanded(
+  flex: 5,
+  child: Padding(
+    padding: const EdgeInsets.all(16),
+    child: plantaSeleccionadaId == null
+        ? const Center(child: Text('Selecciona una planta'))
+        : (() {
+            QueryDocumentSnapshot<Object?>? plantaDoc;
+            for (var p in plants) {
+              if (p.id == plantaSeleccionadaId) {
+                plantaDoc = p;
+                break;
+              }
+            }
+            if (plantaDoc == null) {
+              return const Center(child: Text('La planta seleccionada no está disponible'));
+            }
+            return _contenidoSeccion(plantaDoc.data() as Map<String, dynamic>, seccionActiva);
+          })(),
+  ),
+),
                               Expanded(
                                 flex: 2,
                                 child: ListView(
@@ -320,9 +337,11 @@ class _TusPlantasScreenState extends State<TusPlantasScreen> {
         ],
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16),
+  padding: const EdgeInsets.all(16),
+  child: Row(
+    children: [
+      Expanded(
         child: SizedBox(
-          width: double.infinity,
           height: 50,
           child: ElevatedButton.icon(
             onPressed: () {
@@ -330,8 +349,7 @@ class _TusPlantasScreenState extends State<TusPlantasScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                  builder: (context) => MedirScreen(planta: planta),
-
+                    builder: (context) => MedirScreen(planta: planta),
                   ),
                 );
               } else {
@@ -341,7 +359,7 @@ class _TusPlantasScreenState extends State<TusPlantasScreen> {
               }
             },
             icon: const Icon(Icons.analytics),
-            label: const Text('Ir a Medición'),
+            label: const Text('Medir'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green.shade700,
               foregroundColor: Colors.white,
@@ -350,6 +368,106 @@ class _TusPlantasScreenState extends State<TusPlantasScreen> {
           ),
         ),
       ),
+      const SizedBox(width: 16),
+      Expanded(
+        child: SizedBox(
+          height: 50,
+          child: ElevatedButton.icon(
+            onPressed: () {
+              if (plantaSeleccionadaId != null) {
+                if (planta != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RiegoScreen(planta: planta!),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('No se encontró la planta seleccionada.')),
+                  );
+                }
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Selecciona una planta primero')),
+                );
+              }
+            },
+            icon: const Icon(Icons.opacity),
+            label: const Text('Regar'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue.shade700,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ),
+      ),
+      const SizedBox(width: 16),
+      // Botón para borrar planta
+      Expanded(
+  child: SizedBox(
+    height: 50,
+    child: ElevatedButton.icon(
+      onPressed: plantaSeleccionadaId == null
+          ? null
+          : () async {
+              final confirmar = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Confirmar eliminación'),
+                  content: const Text('¿Seguro que quieres borrar esta planta?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('Cancelar'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text('Borrar', style: TextStyle(color: Colors.red)),
+                    ),
+                  ],
+                ),
+              );
+
+              if (confirmar == true && plantaSeleccionadaId != null) {
+                try {
+                  await FirebaseFirestore.instance
+                      .collection('MisPlantas')
+                      .doc(plantaSeleccionadaId)
+                      .delete();
+
+                  setState(() {
+                    plantaSeleccionadaId = null;
+                    planta = null;
+                    seccionActiva = null;
+                  });
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Planta borrada correctamente')),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error al borrar la planta: $e')),
+                  );
+                }
+              }
+            },
+      icon: const Icon(Icons.delete_forever),
+      label: const Text('Borrar'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.red.shade700,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    ),
+  ),
+),
+
+    ],
+  ),
+),
+
     );
   }
 
